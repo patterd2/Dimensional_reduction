@@ -4,23 +4,24 @@ import seaborn as sns
 from scipy.spatial import distance
 
 #setting the seed to a fixed value to make sure runs of the code are "predictable"
-np.random.seed(0)
+#np.random.seed(0)
 
 #! Global Parameters
-N = 25 # number of agent populations (predators) is N+1
-M = 100 # number of subject populations (prey) is M+1
-T = 50000 # number of timesteps
-dt = 0.01 # length of timestep for forward Euler
+N = 20 # number of agent populations (predators) is N+1
+M = 80 # number of subject populations (prey) is M+1
+T = 400 # number of timesteps
+dt = 0.05 # length of timestep for forward Euler
 
 #! Mutation rate (i.e., how ofter you update a diet preference)
 #P = 0.1 # mutation rate
 Q = 0.05 # mutation strength
 P = 2 # Deactivating mutation
 
-Kmax_array=(0.01,0.02,0.03,0.04,0.05,0.075,0.1,0.3,0.5,1.0,3.0,5.0,7.5,10.,15.)
+#Kmax_array=(0.01,0.02,0.03,0.04,0.05,0.075,0.1,0.3,0.5,1.0,3.0,5.0,7.5,10.0)
+Kmax_array=(0.01,0.03,0.06,0.1,0.5,1.0,2.5,5.0,10.0)
 nK=np.count_nonzero(Kmax_array)
 
-nreps=50
+nreps=8
 ik=0
 #initialization of the arrays that are averaged over replicates for a given Kmax:
 meanBCav_Kmax=np.zeros((nK))
@@ -42,10 +43,10 @@ for Kmax in Kmax_array:
         S[:,0] = 0.1*np.random.rand(M) # RANDOM initial conditions
 
         #Initialization of sizes for the different types (right now, made up values for max and min sizes)
-        smaxS=10#max size for phyplankton, in um
-        sminS=0.1#min size for phytoplankton, in um
-        smaxA=100#max size for zooplankton, in um
-        sminA=1#min size for zooplankton, in um
+        smaxS=0.5#max size for phyplankton, in um
+        sminS=0.01#min size for phytoplankton, in um
+        smaxA=5#max size for zooplankton, in um
+        sminA=0.5#min size for zooplankton, in um
         sizeA=(smaxA-sminA)*np.random.rand(N)+sminA
         sizeS=(smaxS-sminS)*np.random.rand(M)+sminS
         
@@ -252,7 +253,7 @@ for Kmax in Kmax_array:
         #Calculate the Bray-Curtis dissimilarity matrix of that average diet preference matrix:
         for i in np.arange(0,Neff):
             for j in np.arange(0,Neff):
-                BC_av[i,j]=distance.braycurtis(port[i,:],port[j,:])
+                BC_av[i,j]=distance.braycurtis(port[i,:]+0.000001,port[j,:]+0.000001)
 
         #Storing BC stats for the averages over replicates for this Kmax:
         dummy,dummyv = np.linalg.eig(BC_av[:,:])
@@ -338,31 +339,31 @@ np.savetxt('data_output', np.c_[Kmax_array,nsurvA_Kmax/nreps,nsurvS_Kmax/nreps,m
 plt.plot(Kmax_array,meanBCav_Kmax/nreps, marker='o')
 plt.ylabel("mean BC dissimilarity")
 plt.xlabel("Max carrying capacity")
-plt.savefig("./Figs/Fig_meanBC_vs_Kmax.png",dpi=300,bbox_inches='tight')
+plt.savefig("./Figs_feeding_kernel/Fig_meanBC_vs_Kmax.png",dpi=300,bbox_inches='tight')
 plt.close()
 
 plt.plot(Kmax_array,eigenBCav_Kmax/nreps, marker='o')
 plt.ylabel("Eigenvalue BC dissimilarity")
 plt.xlabel("Max carrying capacity")
-plt.savefig("./Figs/Fig_eigenBC_vs_Kmax.png",dpi=300,bbox_inches='tight')
+plt.savefig("./Figs_feeding_kernel/Fig_eigenBC_vs_Kmax.png",dpi=300,bbox_inches='tight')
 plt.close()
 
 plt.plot(Kmax_array,detBCav_Kmax/nreps, marker='o')
 plt.ylabel("Determinant BC dissimilarity")
 plt.xlabel("Max carrying capacity")
-plt.savefig("./Figs/Fig_detBC_vs_Kmax.png",dpi=300,bbox_inches='tight')
+plt.savefig("./Figs_feeding_kernel/Fig_detBC_vs_Kmax.png",dpi=300,bbox_inches='tight')
 plt.close()
 
 plt.plot(Kmax_array,nsurvA_Kmax/nreps, marker='o')
 plt.ylabel("Percentage of surviving zooplankton types")
 plt.xlabel("Max carrying capacity")
-plt.savefig("./Figs/Fig_Zsurv_vs_Kmax.png",dpi=300,bbox_inches='tight')
+plt.savefig("./Figs_feeding_kernel/Fig_Zsurv_vs_Kmax.png",dpi=300,bbox_inches='tight')
 plt.close()
 
 plt.plot(Kmax_array,nsurvS_Kmax/nreps, marker='o')
 plt.ylabel("Percentage of surviving phytoplankton types")
 plt.xlabel("Max carrying capacity")
-plt.savefig("./Figs/Fig_Psurv_vs_Kmax.png",dpi=300,bbox_inches='tight')
+plt.savefig("./Figs_feeding_kernel/Fig_Psurv_vs_Kmax.png",dpi=300,bbox_inches='tight')
 plt.close()
 
 #CLOSER LOOK TO SAME PLOTS:
@@ -371,33 +372,33 @@ plt.plot(Kmax_array,meanBCav_Kmax/nreps, marker='o')
 plt.ylabel("mean BC dissimilarity")
 plt.xlabel("Max carrying capacity")
 plt.xlim([0.005,0.5])
-plt.savefig("./Figs/Fig_meanBC_vs_Kmax_ZOOM.png",dpi=300,bbox_inches='tight')
+plt.savefig("./Figs_feeding_kernel/Fig_meanBC_vs_Kmax_ZOOM.png",dpi=300,bbox_inches='tight')
 plt.close()
 
 plt.plot(Kmax_array,eigenBCav_Kmax/nreps, marker='o')
 plt.ylabel("Eigenvalue BC dissimilarity")
 plt.xlabel("Max carrying capacity")
 plt.xlim([0.005,0.5])
-plt.savefig("./Figs/Fig_eigenBC_vs_Kmax_ZOOM.png",dpi=300,bbox_inches='tight')
+plt.savefig("./Figs_feeding_kernel/Fig_eigenBC_vs_Kmax_ZOOM.png",dpi=300,bbox_inches='tight')
 plt.close()
 
 plt.plot(Kmax_array,detBCav_Kmax/nreps, marker='o')
 plt.ylabel("Determinant BC dissimilarity")
 plt.xlabel("Max carrying capacity")
 plt.xlim([0.005,0.5])
-plt.savefig("./Figs/Fig_detBC_vs_Kmax_ZOOM.png",dpi=300,bbox_inches='tight')
+plt.savefig("./Figs_feeding_kernel/Fig_detBC_vs_Kmax_ZOOM.png",dpi=300,bbox_inches='tight')
 plt.close()
 
 plt.plot(Kmax_array,nsurvA_Kmax/nreps, marker='o')
 plt.ylabel("Percentage of surviving zooplankton types")
 plt.xlabel("Max carrying capacity")
 plt.xlim([0.005,0.5])
-plt.savefig("./Figs/Fig_Zsurv_vs_Kmax_ZOOM.png",dpi=300,bbox_inches='tight')
+plt.savefig("./Figs_feeding_kernel/Fig_Zsurv_vs_Kmax_ZOOM.png",dpi=300,bbox_inches='tight')
 plt.close()
 
 plt.plot(Kmax_array,nsurvS_Kmax/nreps, marker='o')
 plt.ylabel("Percentage of surviving phytoplankton types")
 plt.xlabel("Max carrying capacity")
 plt.xlim([0.005,0.5])
-plt.savefig("./Figs/Fig_Psurv_vs_Kmax_ZOOM.png",dpi=300,bbox_inches='tight')
+plt.savefig("./Figs_feeding_kerne1/Fig_Psurv_vs_Kmax_ZOOM.png",dpi=300,bbox_inches='tight')
 plt.close()
