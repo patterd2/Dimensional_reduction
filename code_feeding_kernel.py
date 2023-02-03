@@ -9,7 +9,7 @@ from scipy.spatial import distance
 #! Global Parameters
 N = 20 # number of agent populations (predators) is N+1
 M = 80 # number of subject populations (prey) is M+1
-T = 400 # number of timesteps
+T = 500 # number of timesteps
 dt = 0.05 # length of timestep for forward Euler
 
 #! Mutation rate (i.e., how ofter you update a diet preference)
@@ -21,7 +21,7 @@ P = 2 # Deactivating mutation
 Kmax_array=(0.01,0.03,0.06,0.1,0.5,1.0,2.5,5.0,10.0)
 nK=np.count_nonzero(Kmax_array)
 
-nreps=8
+nreps=25
 ik=0
 #initialization of the arrays that are averaged over replicates for a given Kmax:
 meanBCav_Kmax=np.zeros((nK))
